@@ -4,7 +4,7 @@ Oracle Cloud Infrastructure Container Engine for Kubernetes (OKE) is a fully-man
 
 Please visit the [OKE documentation page](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm) for more information.
 
-This guide has the instructions for deploying an OKE cluster using H100 & A100 bare metal nodes with RDMA connectivity using the [GPU Operator](https://github.com/NVIDIA/gpu-operator) and [Network Operator](https://github.com/Mellanox/network-operator).
+This guide has the instructions for deploying an OKE cluster using H100 & A100 bare metal nodes with RDMA connectivity using the [GPU Operator](https://github.com/NVIDIA/gpu-operator).
 
 ### What is NVIDIA GPU Operator?
 Kubernetes provides access to special hardware resources such as NVIDIA GPUs, NICs, Infiniband adapters and other devices through the device plugin framework. However, configuring and managing nodes with these hardware resources requires configuration of multiple software components such as drivers, container runtimes or other libraries which are difficult and prone to errors. The NVIDIA GPU Operator uses the operator framework within Kubernetes to automate the management of all NVIDIA software components needed to provision GPU. These components include the NVIDIA drivers (to enable CUDA), Kubernetes device plugin for GPUs, the NVIDIA Container Runtime, automatic node labelling, DCGM based monitoring and others.
@@ -22,18 +22,12 @@ You must create the necessary OKE policies:
 
 ## Instructions for deploying an OKE cluster with GPUs and RDMA connectivity
 
-You will need a CPU and a GPU pool. The Terraform template deploys an operational/system worker pool (CPU) and a GPU worker pool.
-
-The GPU pool requires you to use an images provided by the Oracle HPC team. This image included the OFED drivers and necessary packages configured for RDMA.
+The nodes pools require you to use an images provided by the Oracle HPC team. This image included the OFED drivers and necessary packages configured for RDMA.
 
 Please reach out to your sales representative to get the images required for deploying this template.
 
-### Deploy the cluster using the Terraform template
-You can find the template in the [terraform directory](./terraform/).
-
-Make sure to update the variables in the `worker pools` blocks.
-
-You can find more information on setting up Terraform for OCI [here](https://docs.oracle.com/en-us/iaas/developer-tutorials/tutorials/tf-provider/01-summary.htm).
+### Deploy the cluster using the OCI Resource Manager stack
+You can find the template in the [stack directory](./stack/).
 
 The template will deploy a `bastion` instance and an `operator` instance. The `operator` instance will have access to the OKE cluster. You can connect to the `operator` instance via SSH with `ssh -J opc@<bastion IP> opc@<operator IP>`.
 
@@ -57,7 +51,7 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 ```
 
-### Add Helm repos for Network Operator and GPU Operator
+### Add the Helm repo for GPU Operator
 ```sh
 helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
 helm repo update
@@ -80,7 +74,7 @@ Wait until all network operator pods are running with `kubectl get pods -n gpu-o
 ### Deploy RDMA Shared Device plugin
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/oracle-quickstart/oci-hpc-oke/hostnetwork/manifests/rdma-shared-device-configmap.yaml
+kubectl apply -f https://raw.githubusercontent.com/OguzPastirmaci/oke-hpc-stack/hostnetwork/manifests/rdma-shared-device-configmap.yaml
 
 kubectl apply -f https://raw.githubusercontent.com/Mellanox/k8s-rdma-shared-dev-plugin/master/deployment/k8s/base/daemonset.yaml
 ```
@@ -204,17 +198,11 @@ Warning: Permanently added 'nccl-allreduce-job0-mpiworker-1.nccl-allreduce-job0'
 #### Are there any features that are not supported when using self-managed nodes?
 Yes, some features and capabilities are not available, or not yet available, when using self-managed nodes. Please see [this link](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengworkingwithselfmanagednodes.htm) for a list of features and capabilities that are not available for self-managed nodes.
 
-#### Can I use Ubuntu as the operating system?
-We are working on adding support for Ubuntu, but it is not available today.
-
 #### I don't see my GPU nodes in the OKE page in the console under worker pools
 This is expected. Currently, only the worker pools with the `node-pool` mode are listed. Self-managed nodes (`cluster-network` and `instance-pool` modes in worker pools) are created by you and joined to the OKe cluster, rather than OKE has created for you.
 
 #### Can I use Multi-Instance GPU (MIG)?
 Yes, you can configure GPU Operator with MIG. Please see the instructions [here](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-operator-mig.html).
 
-#### If I don't need RDMA connectivity between my H100 or A100 nodes, do I still need to follow the instructions in this repo?
-No, if you don't need RDMA connectivity between your nodes, you can deploy an OKE cluster without using any self-managed nodes. The easiest way to do it is using the web console. H100 need to have flannel as a POD networking type and make use of a custom images. We are working on a better experience on H100 without RDMA. 
-
-#### I'm getting the "400-InvalidParameter, Shape <GPU BM shape> is incompatible with image" error
+ #### I'm getting the "400-InvalidParameter, Shape <GPU BM shape> is incompatible with image" error
 Please follow the instructions [here](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/configuringimagecapabilities.htm#configuringimagecapabilities_topic-using_the_console) to add the capability of the shape that you are getting the error to your imported image.

@@ -1,0 +1,21 @@
+apiVersion: v1
+data:
+  config.json: |
+    {
+      "periodicUpdateInterval": 300,
+      "configList": [
+        {
+          "resourceName": "roce",
+          "rdmaHcaMax": 1,
+          "selectors": {
+            "drivers": [
+              "mlx5_core"
+            ]
+          }
+        }
+      ]
+    }
+kind: ConfigMap
+metadata:
+  name: rdma-devices
+  namespace: kube-system
