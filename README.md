@@ -121,12 +121,12 @@ kubectl create rolebinding default-view --namespace default --serviceaccount def
 
 ##### H100
 ```
-kubectl apply -f https://raw.githubusercontent.com/oracle-quickstart/oci-hpc-oke/main/manifests/h100-nccl-test.yaml
+kubectl apply -f https://raw.githubusercontent.com/OguzPastirmaci/oke-hpc-stack/main/manifests/h100-nccl-test.yaml
 ```
 
 ##### A100
 ```
-kubectl apply -f https://raw.githubusercontent.com/oracle-quickstart/oci-hpc-oke/main/manifests/a100-nccl-test.yaml
+kubectl apply -f https://raw.githubusercontent.com/OguzPastirmaci/oke-hpc-stack/main/manifests/a100-nccl-test.yaml
 ```
 
 The initial pull of the container will take long. Once the master pod `nccl-allreduce-job0-mpimaster-0` starts running, you can check it logs for the NCCL test result.
