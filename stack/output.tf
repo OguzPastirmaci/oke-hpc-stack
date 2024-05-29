@@ -52,3 +52,13 @@ output "worker_ops_pool_id" { value = lookup(module.oke.worker_pool_ids, "oke-op
 output "worker_cpu_pool_id" { value = lookup(module.oke.worker_pool_ids, "oke-cpu", null) }
 output "worker_gpu_pool_id" { value = lookup(module.oke.worker_pool_ids, "oke-gpu", null) }
 output "worker_rdma_pool_id" { value = lookup(module.oke.worker_pool_ids, "oke-rdma", null) }
+
+# Storage
+output "fss_ad" { value = oci_file_storage_file_system.fss.availability_domain }
+output "fss_filesystem_id" { value = oci_file_storage_file_system.fss.id }
+output "fss_volume_name" { value = local.fss_volume_name }
+output "fss_nsg_id" { value = local.fss_nsg_id }
+output "fss_subnet_id" { value = local.fss_subnet_id }
+output "fss_mount_target_ip" { value = local.fss_ip_address }
+output "fss_mount_target_id" { value = oci_file_storage_mount_target.fss.id }
+output "fss_export_set_id" { value = oci_file_storage_export_set.fss.id }

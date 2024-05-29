@@ -17,6 +17,8 @@ spec:
           action: CompleteJob
       template:
         spec:
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
           volumes:
             - name: topo
               configMap:
@@ -45,7 +47,7 @@ spec:
           terminationGracePeriodSeconds: 2
           tolerations:
             - key: nvidia.com/gpu
-              operator: Exists          
+              operator: Exists
           containers:
             - command:
                 - /bin/bash
@@ -69,7 +71,10 @@ spec:
                     -x NCCL_IB_HCA=mlx5 \
                     -x NCCL_TOPO_FILE=/topo/topo.xml \
                     /workspace/nccl-tests/build/all_reduce_perf -b 8 -f 2 -g 1 -e 8G -c 1; sleep 3600
-              image: iad.ocir.io/hpc_limited_availability/nccl-tests:pytorch-23.10-nccl-2.19.3-1
+              image: iad.ocir.io/hpc_limited_availability/nccl-tests:pytorch-24.02-nccl-2.20.5-1
+              env:
+                  - name: OMPI_MCA_plm_rsh_args
+                    value: "-p 2222"
               volumeMounts:
               - { mountPath: /topo, name: topo }
               - { mountPath: /host, name: root }
@@ -91,17 +96,16 @@ spec:
       minAvailable: 2
       name: mpiworker
       template:
-        metadata:
-          annotations:
-            k8s.v1.cni.cncf.io/networks: oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov,oci-rdma-sriov
         spec:
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
           containers:
             - name: mpiworker
               command:
                 - /bin/bash
                 - -c
-                - mkdir -p /var/run/sshd; /usr/sbin/sshd -D;
-              image: iad.ocir.io/hpc_limited_availability/nccl-tests:pytorch-23.10-nccl-2.19.3-1
+                - mkdir -p /var/run/sshd; /usr/sbin/sshd -p 2222 -D;
+              image: iad.ocir.io/hpc_limited_availability/nccl-tests:pytorch-24.02-nccl-2.20.5-1
               securityContext:
                 capabilities:
                   add: ["IPC_LOCK"]
@@ -112,11 +116,11 @@ spec:
               resources:
                 requests:
                   nvidia.com/gpu: 8
-                  nvidia.com/sriov_rdma_vf: 16
+                  rdma/roce: 1
                   ephemeral-storage: 1Gi
                 limits:
                   nvidia.com/gpu: 8
-                  nvidia.com/sriov_rdma_vf: 16
+                  rdma/roce: 1
                   ephemeral-storage: 1Gi
               volumeMounts:
               - { mountPath: /topo, name: topo }

@@ -11,7 +11,7 @@ data "oci_core_vcn_dns_resolver_association" "oke" {
 }
 
 data "oci_dns_resolver" "oke" {
-  depends_on  = [time_sleep.wait_3_min_resolver]
+  depends_on  = [time_sleep.wait_5_min_resolver]
   count       = local.dns_resolver != null ? 1 : 0
   resolver_id = data.oci_core_vcn_dns_resolver_association.oke.dns_resolver_id
   scope       = "PRIVATE"
@@ -27,7 +27,7 @@ resource "oci_dns_zone" "oke" {
   view_id   = local.dns_view_id
 }
 
-resource "time_sleep" "wait_3_min_resolver" {
-  create_duration = "3m"
+resource "time_sleep" "wait_5_min_resolver" {
+  create_duration = "5m"
   depends_on      = [data.oci_core_vcn_dns_resolver_association.oke]
 }
