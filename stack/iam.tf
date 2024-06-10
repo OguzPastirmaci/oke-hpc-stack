@@ -58,8 +58,9 @@ locals {
   ))
 }
 
-resource "oci_identity_dynamic_group" "oke_demo_all" {
+resource "oci_identity_dynamic_group" "oke_quickstart_all" {
   provider       = oci.home
+  count          = var.create_policies ? 1 : 0
   compartment_id = var.tenancy_ocid # dynamic groups exist in root compartment (tenancy)
   name           = local.group_name
   description    = format("Dynamic group of instances for OKE Terraform state %v", local.state_id)
@@ -69,8 +70,9 @@ resource "oci_identity_dynamic_group" "oke_demo_all" {
   }
 }
 
-resource "oci_identity_policy" "oke_demo_all" {
+resource "oci_identity_policy" "oke_quickstart_all" {
   provider       = oci.home
+  count          = var.create_policies ? 1 : 0
   compartment_id = var.compartment_ocid
   name           = local.group_name
   description    = format("Policies for OKE Terraform state %v", local.state_id)

@@ -13,7 +13,7 @@ locals {
 }
 
 module "oke" {
-  source                       = "github.com/devoncrouse/terraform-oci-oke.git?ref=tf12&depth=1"
+  source                       = "github.com/OguzPastirmaci/terraform-oci-oke-stack-source.git?ref=tf12&depth=1"
   providers                    = { oci.home = oci.home }
   region                       = var.region
   tenancy_id                   = var.tenancy_ocid
@@ -77,7 +77,7 @@ module "oke" {
   vcn_create_service_gateway        = "always"
   vcn_id                            = var.vcn_id
   vcn_name                          = local.vcn_name
-  worker_cloud_init                 = local.worker_cloud_init
+  #worker_cloud_init             = local.worker_cloud_init
   worker_disable_default_cloud_init = true
   worker_is_public                  = false
   worker_pools                      = local.worker_pools

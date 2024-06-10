@@ -49,11 +49,20 @@ locals {
     ["oci-oke-node-all", "1.27.2*"],
   ]
 
-  runcmd_bootstrap = <<-EOT
+  runcmd_bootstrap_cpu = <<-EOT
     oke bootstrap \
+        --manage-gpu-services \
         --crio-extra-args "--root /var/lib/oke-crio" \
       || echo "Error starting OKE worker node" >&2
   EOT
+
+   runcmd_bootstrap_gpu = <<-EOT
+    oke bootstrap \
+        --manage-gpu-services \
+        --taint '{"key":"nvidia.com/gpu","value":"present","effect":"NoSchedule"}' \
+        --crio-extra-args "--root /var/lib/oke-crio" \
+      || echo "Error starting OKE worker node" >&2
+  EOT 
 
   write_files = [
     {
@@ -68,19 +77,33 @@ locals {
       permissions = "0644",
     }
   ]
-  cloud_init = {
+  cloud_init_gpu = {
     ssh_authorized_keys = local.ssh_authorized_keys
     yum_repos           = local.yum_repos
     apt                 = local.apt
     packages            = local.packages
-    runcmd              = [local.runcmd_bootstrap]
+    runcmd              = [local.runcmd_bootstrap_gpu]
     write_files         = local.write_files
     fs_setup            = local.fs_setup
     disk_setup          = local.disk_setup
     mounts              = local.mounts
   }
 
-  worker_cloud_init = [{ content_type = "text/cloud-config", content = yamlencode(local.cloud_init) }]
+  cloud_init_cpu = {
+  ssh_authorized_keys = local.ssh_authorized_keys
+  yum_repos           = local.yum_repos
+  apt                 = local.apt
+  packages            = local.packages
+  runcmd              = [local.runcmd_bootstrap_cpu]
+  write_files         = local.write_files
+  fs_setup            = local.fs_setup
+  disk_setup          = local.disk_setup
+  mounts              = local.mounts
+  }
+
+  worker_cloud_init_cpu = [{ content_type = "text/cloud-config", content = yamlencode(local.cloud_init_cpu) }]
+  worker_cloud_init_gpu = [{ content_type = "text/cloud-config", content = yamlencode(local.cloud_init_gpu) }]
+
   worker_pools = {
     "oke-ops" = {
       create           = local.create_workers
@@ -93,6 +116,7 @@ locals {
       boot_volume_size = 128
       image_type              = "custom"
       image_id         = local.worker_ops_image_id
+      cloud_init       = [{ content_type = "text/cloud-config", content = yamlencode(local.cloud_init_cpu) }]
     }
     "oke-cpu" = {
       create           = local.create_workers && var.worker_cpu_enabled
@@ -105,6 +129,7 @@ locals {
       boot_volume_size = var.worker_cpu_boot_volume_size
       image_type       = "custom"
       image_id         = local.worker_cpu_image_id
+      cloud_init       = [{ content_type = "text/cloud-config", content = yamlencode(local.cloud_init_cpu) }]
     }
     "oke-gpu" = {
       create           = local.create_workers && var.worker_gpu_enabled
@@ -115,6 +140,7 @@ locals {
       boot_volume_size = var.worker_gpu_boot_volume_size
       image_type       = "custom"
       image_id         = local.worker_gpu_image_id
+      cloud_init       = [{ content_type = "text/cloud-config", content = yamlencode(local.cloud_init_gpu) }]
     }
     "oke-rdma" = {
       create                  = local.create_workers && var.worker_rdma_enabled
@@ -127,6 +153,7 @@ locals {
       boot_volume_vpus_per_gb = var.worker_rdma_boot_volume_vpus_per_gb
       image_type              = "custom"
       image_id                = local.worker_rdma_image_id
+      cloud_init              = [{ content_type = "text/cloud-config", content = yamlencode(local.cloud_init_gpu) }]
       agent_config = {
         are_all_plugins_disabled = false
         is_management_disabled   = false

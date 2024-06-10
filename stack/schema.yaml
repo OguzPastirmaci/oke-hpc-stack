@@ -55,12 +55,12 @@ variableGroups:
       - bastion_allowed_cidrs
       - ssh_public_key
 
-  - title: Shared Storage
-    variables:
-      - create_fss
-      - fss_ad
-      - fss_size
-      - fss_namespaces
+#  - title: Shared Storage
+#    variables:
+#      - create_fss
+#      - fss_ad
+#      - fss_size
+#      - fss_namespaces
 
   - title: OKE Cluster
     variables:
@@ -225,19 +225,19 @@ variables:
     visible: ${create_bastion}
 
   # Storage
-  create_fss:
-    title: Create File Storage Service (FSS) volume
-    description: Provision a shared File Storage Service (FSS) filesystem
-    type: boolean
-    default: false
-    required: true
-  fss_ad:
-    title: FSS availability domain
-    type: oci:identity:availabilitydomain:name
-    required: true
-    visible: ${create_fss}
-    dependsOn:
-      compartmentId: ${compartment_ocid}
+ # create_fss:
+ #   title: Create File Storage Service (FSS) volume
+ #   description: Provision a shared File Storage Service (FSS) filesystem
+ #   type: boolean
+ #   default: false
+ #   required: true
+ # fss_ad:
+ #   title: FSS availability domain
+ #   type: oci:identity:availabilitydomain:name
+ #   required: true
+ #   visible: ${create_fss}
+ #   dependsOn:
+ #     compartmentId: ${compartment_ocid}
 
   # Cluster
   cluster_name:
@@ -739,16 +739,16 @@ outputGroups:
       - operator_private_ip
       - operator_ssh_command
 
-  - title: File Storage Service (FSS)
-    outputs:
-      - fss_ad
-      - fss_subnet_id
-      - fss_nsg_id
-      - fss_volume_name
-      - fss_filesystem_id
-      - fss_mount_target_id
-      - fss_mount_target_ip
-      - fss_export_set_id
+#  - title: File Storage Service (FSS)
+#    outputs:
+#      - fss_ad
+#      - fss_subnet_id
+#      - fss_nsg_id
+#      - fss_volume_name
+#      - fss_filesystem_id
+#      - fss_mount_target_id
+#      - fss_mount_target_ip
+#      - fss_export_set_id
 
   - title: Cluster
     outputs:
@@ -850,24 +850,24 @@ outputs:
     type: copyableString
 
   # File Storage Service (FSS)
-  fss_ad:
-    title: Availability domain
-    type: copyableString
-  fss_volume_name:
-    title: Volume name
-    type: string
-  fss_subnet_id:
-    title: Subnet
-    type: ocid
-  fss_nsg_id:
-    title: Network security group
-    type: ocid
-  fss_mount_target_id:
-    title: Mount target
-    type: ocid
-  fss_mount_target_ip:
-    title: Mount target IP
-    type: copyableString
+#  fss_ad:
+#    title: Availability domain
+#    type: copyableString
+#  fss_volume_name:
+#    title: Volume name
+#    type: string
+#  fss_subnet_id:
+#    title: Subnet
+#    type: ocid
+#  fss_nsg_id:
+#    title: Network security group
+#    type: ocid
+#  fss_mount_target_id:
+#    title: Mount target
+#    type: ocid
+#  fss_mount_target_ip:
+#    title: Mount target IP
+#    type: copyableString
 
   # Cluster
   cluster_id:

@@ -17,10 +17,6 @@ variable "bastion_image_type" {
   default     = "platform"
   description = "Whether to use a platform or custom image for the created bastion instance. When custom is set, the bastion_image_id must be specified."
   type        = string
-  validation {
-    condition     = contains(["custom", "platform"], var.bastion_image_type)
-    error_message = "Accepted values are custom or platform"
-  }
 }
 
 variable "bastion_image_os" {
@@ -73,14 +69,10 @@ variable "operator_image_type" {
   default     = "platform"
   description = "Whether to use a platform or custom image for the created operator instance. When custom is set, the operator_image_id must be specified."
   type        = string
-  validation {
-    condition     = contains(["custom", "platform"], var.operator_image_type)
-    error_message = "Accepted values are custom or platform"
-  }
 }
 
-variable "create_fss" { default = false }
-variable "fss_ad" { default = "" }
+#variable "create_fss" { default = false }
+#variable "fss_ad" { default = "" }
 
 variable "worker_ops_memory" { default = 64 }
 variable "worker_ops_ocpus" { default = 16 }
