@@ -68,7 +68,7 @@ module "oke" {
   output_detail = true
   pods_cidr     = "10.240.0.0/12" # TODO input var (but keep expanded default)
   # services_cidr                     = "10.96.0.0/16"
-  preferred_load_balancer           = "internal"
+  #preferred_load_balancer           = "internal"
   ssh_public_key                    = trimspace(var.ssh_public_key)
   use_defined_tags                  = false
   vcn_cidrs                         = split(",", var.vcn_cidrs)
